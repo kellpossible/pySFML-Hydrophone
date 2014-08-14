@@ -5,45 +5,6 @@ from ecs.models import Entity, Component, System
 from ecs.managers import EntityManager, SystemManager
 from math import *
 
-def doppler_test():
-	try: buffer = sf.SoundBuffer.from_file("engine_idle_freesound_loop.wav")
-	except IOError: exit(1)
-
-	sound = sf.Sound()
-	sound.buffer = buffer
-	sound.loop = True
-	sound.attenuation = 0.05
-	sound.play()
-
-	speed_sound = 150
-	base_pitch = 1.0
-	pos = Vector3(-500, 40, 0)
-	old_distance = pos.mag()
-	vel = Vector3(40, 0, 0)
-
-	old_time = time.clock()
-
-	def to_sf_vector(v):
-		return sf.Vector3(v.x, v.y, v.z)
-
-
-	while True:
-		new_time = time.clock()
-		dt = new_time - old_time
-		pos = pos.add(vel.fmul(dt))
-		new_distance = pos.mag()
-		sound.position = to_sf_vector(pos)
-
-		rel_vel = (old_distance - new_distance)/dt
-
-		new_pitch = speed_sound/(speed_sound - rel_vel)
-		#print(new_pitch)
-		#print(pos, rel_vel)
-		sound.pitch = new_pitch
-		old_time = new_time
-		old_distance = new_distance
-
-
 class SoundComponent(Component):
 	def __init__(self, soundfile):
 		self.soundfile = soundfile
