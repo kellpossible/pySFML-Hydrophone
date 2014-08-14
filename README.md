@@ -8,3 +8,4 @@ Features
 
 Some of the features include:
 - doppler effect simulation
+- use of the ecs python entity/component system
