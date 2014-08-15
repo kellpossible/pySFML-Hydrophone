@@ -149,8 +149,8 @@ class Rotation(object):
 	
 	@staticmethod
 	def aroundZ(a):
-		cosa = cos(a)
-		sina = sin(a)
+		cosa = cos(-a)
+		sina = sin(-a)
 		matrix = [	[cosa, -sina, 0],
 					[sina, cosa, 0],
 					[0, 0, 1]]
