@@ -5,6 +5,56 @@ from ecs.models import Entity, Component, System
 from ecs.managers import EntityManager, SystemManager
 from math import *
 
+
+class CircleSector(object):
+	"""
+	Sector goes from acw_angle to cw_angle in a clockwise direction.
+	or from cw_angle to acw_angle in an anticlockwise direction.
+	cw_angle : clockwise angle (on the clockwise side of the sector)
+	acw_angle : anticlockwise angle (on the anticlockwise side of the sector)
+	"""
+	def __init__(self, position, cw_angle, acw_angle, radius):
+		self.position = position
+		self.radius = radius
+
+		self.set_cw_angle(cw_angle)
+		self.set_acw_angle(acw_angle)
+
+	def set_cw_angle(self, cw_angle):
+		cw_rot = Rotation.aroundZ(cw_angle)
+		self.cw_vec = Vector3.Y().rotate(cw_rot)
+		self.cw_angle = cw_angle
+
+	def set_acw_angle(self, acw_angle):
+		acw_rot = Rotation.aroundZ(acw_angle)
+		self.acw_vec = Vector3.Y().rotate(acw_rot)
+		self.acw_angle = acw_angle
+
+	def angleGap(self):
+		"""angular distance between cw_angle and acw_angle"""
+		if self.cw_angle < self.acw_angle:
+			return abs((self.acw_angle - 360.0) - self.cw_angle)
+		else:
+			return abs(self.acw_angle - self.cw_angle)
+
+	def isClockwise(self, v1, v2):
+		"""checks if v2 is clockwise of v1"""
+		return (-v1.x*v2.y + v1.y*v2.x) > 0.0
+
+	def intersectPoint(self, point):
+		r_vec = point.sub(self.position)
+		if r_vec.mag() > self.radius:
+			return None
+
+		#use an optimised method when the angle gap is small
+		if self.angleGap() < 180.0:
+			if not self.isClockwise(self.cw_vec, point):
+				if self.isClockwise(self.acw_vec, point):
+					return point
+			return None
+
+
+
 class SoundComponent(Component):
 	def __init__(self, soundfile):
 		self.soundfile = soundfile
@@ -339,4 +389,9 @@ def scanner_test():
 		w.display()
 
 if __name__ == "__main__":
-	scanner_test()
+	#scanner_test()
+
+	c = CircleSector(Vector3(), radians(90), radians(-90), 100)
+	p = Vector3(1, -0.0001, 0)
+	print(c.angleGap())
+	print(c.intersectPoint(p))
